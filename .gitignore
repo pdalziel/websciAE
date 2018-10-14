@@ -1,4 +1,12 @@
 .DS_Store
 .idea
-./docs/secret.txt
+/docs/secret.txt
+/psite_venv
+/docs/streamlog.log
+/docs/tweets.json
 /twitterStreamer/secret.py
+
+__pycache__/
+docs/secret.txt
+psite_venv/
+twitterStreamer/__pycache__/
