@@ -9,4 +9,4 @@
 __pycache__/
 docs/secret.txt
 psite_venv/
-twitterStreamer/__pycache__/
+collectors/__pycache__/

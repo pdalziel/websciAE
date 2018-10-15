@@ -1,15 +1,11 @@
 import logging
-from configparser import ConfigParser
+import configparser
+import sample_stream_listener
 
 import tweepy
 from pymongo import MongoClient
 from tweepy import Stream
-
-from twitterStreamer import secret
-from twitterStreamer.websciAE import StreamListener
-
-
-config_file = 'twitterStreamer/config.ini'
+from collectors import secret
 
 
 def setup_logger(logfile):
@@ -23,14 +19,11 @@ def setup_logger(logfile):
     return logger
 
 
-def config_mongo():
-    mongo_host = ['SAMPLE_STREAM']['mongo_host']
-    db_name = ['SAMPLE_STREAM']['db']
-    collection = 'test' # ['SAMPLE_STREAM']['collection']
-    client = MongoClient(mongo_host + db_name)
-    db = client.db_name
+def config_mongo(config):
 
-    return collection, db, mongo_host
+    mongo_host = config['SAMPLE_STREAM']['mongo_host']
+    db = config['SAMPLE_STREAM']['db']
+    return db, mongo_host
 
 
 def get_auth():
@@ -44,20 +37,27 @@ def get_auth():
 
 
 def collect_streaming_sample():
-    config = configParser.ConfigParser()
+    config = configparser.ConfigParser()
     config.read(config_file)
-    collection, db, mongo_host = config_mongo()
-    time_limit = ['SAMPLE_STREAM']['time_limit']
+    db, mongo_host = config_mongo(config)
+    time_limit = int(config['SAMPLE_STREAM']['time_limit'])
     logfile = config['SAMPLE_STREAM']['logfile']
     logger = setup_logger(logfile)
     auth = get_auth()
-    listener = StreamListener(logger, mongo_host, time_limit, auth, db, collection, api=tweepy.API(wait_on_rate_limit=True))
+    listener = sample_stream_listener.SampleStreamListener(logger, mongo_host, time_limit, auth)
     stream = Stream(auth, listener)
-    stream.sample()
+    return stream
 
+def collect_filtered_stream(track_tags, users):
+    
 
 if __name__ == '__main__':
-    collect_streaming_sample()
+
+    config_file = "/home/paul/PycharmProjects/websciAE/docs/config.ini"
+    stream = collect_streaming_sample()
+    #stream.
+    stream.filter(follow=['44196397'])
+
 
 
 
