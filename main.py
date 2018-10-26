@@ -1,11 +1,12 @@
 import logging
 import configparser
-import sample_stream_listener
+
 
 import tweepy
 from pymongo import MongoClient
 from tweepy import Stream
-from collectors import secret
+from collectors import get_tokens
+from collectors import sample_stream_listener
 
 
 def setup_logger(logfile):
@@ -27,10 +28,11 @@ def config_mongo(config):
 
 
 def get_auth():
-    consumer_key = secret.CONSUMER_KEY
-    consumer_secret = secret.CONSUMER_SECRET
-    access_token = secret.ACCESS_TOKEN
-    access_token_secret = secret.ACCESS_TOKEN_SECRET
+    secrets_dict = get_tokens()
+    consumer_key = secrets_dict.get("consumer_key")
+    consumer_secret = secrets_dict.get("consumer_secret")
+    access_token = secrets_dict.get("access_token")
+    access_token_secret = secrets_dict.get("access_token_secret")
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
     return auth
@@ -49,6 +51,7 @@ def collect_streaming_sample():
     return stream
 
 def collect_filtered_stream(track_tags, users):
+    pass
     
 
 if __name__ == '__main__':
