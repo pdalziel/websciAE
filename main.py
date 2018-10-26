@@ -50,6 +50,7 @@ def collect_streaming_sample():
     stream = Stream(auth, listener)
     return stream
 
+
 def collect_filtered_stream(track_tags, users):
     pass
     

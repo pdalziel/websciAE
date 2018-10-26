@@ -6,6 +6,7 @@ from tweepy import API, Stream
 
 
 class SampleStreamListener(tweepy.StreamListener):
+    """Not compatible with Python 3.7 due to tweepy implementation of SampleStreamListener"""
     def __init__(self, logger, mongo_host, time_limit, api=None):
         self.api = api or API()
         self.time = time.time()
