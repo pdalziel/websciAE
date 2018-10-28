@@ -6,11 +6,12 @@ from tweepy import API, Stream
 
 
 class SampleStreamListener(tweepy.StreamListener):
-    """Not compatible with Python 3.7 due to tweepy implementation of SampleStreamListener"""
-    def __init__(self, logger, mongo_host, time_limit, collection_name, api=None):
+    """Not compatible with Python 3.7 due to tweepy implementation of SampleStreamListener
+    overrides tweepy.StreamListener to add logic"""
+    def __init__(self, logger, mongo_host, collection, time_limit=None, api=None):
         self.api = api or API()
-        self.collection_name = collection_name
-        self.time = time.time()
+        self.collection_name = collection
+        self.start_time = time.time()
         self.limit = time_limit
         self.logger = logger
         self.mongo_host = mongo_host
@@ -30,19 +31,20 @@ class SampleStreamListener(tweepy.StreamListener):
         Override this method if you wish to manually handle
         the stream data. Return False to stop stream and close connection.
         """
-        while (time.time() - self.time) < self.limit:
-            try:
-                client = MongoClient(self.mongo_host)
-                db = client.twitterdb
-                datajson = json.loads(data)
-                collection = db[self.collection_name]
-                db.collection.insert(datajson)
-                print(datajson)
-            except Exception as e:
-                self.logger.info("Exception " + str(e))
-                print(e)
-
-        self.logger.info("Ended stream")
+        try:
+            if time.time() >= self.start_time + self.limit:
+                self.logger.info("Time limit reached")
+                return False  # kill the stream
+            client = MongoClient(self.mongo_host)
+            db = client.twitterdb
+            datajson = json.loads(data)
+            print(self.collection_name)
+            collection = db[self.collection_name]
+            db.collection.insert(datajson)
+            print(datajson)
+        except Exception as e:
+            self.logger.info("Exception " + str(e))
+            print(e)
 
     def on_error(self, status_code):
         """Called when a non-200 status code is returned"""
