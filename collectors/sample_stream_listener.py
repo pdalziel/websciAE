@@ -8,15 +8,15 @@ from tweepy import API, Stream
 class SampleStreamListener(tweepy.StreamListener):
     """Not compatible with Python 3.7 due to tweepy implementation of SampleStreamListener
     overrides tweepy.StreamListener to add logic"""
-    def __init__(self, logger, mongo_host, collection, time_limit=None, api=None):
-        self.api = api or API()
-        self.collection_name = collection
-        self.start_time = time.time()
-        self.limit = time_limit
+    def __init__(self, logger, mongo_host, collection_id, time_limit,  api=None):
         self.logger = logger
         self.mongo_host = mongo_host
+        self.collection_name = collection_id
+        self.limit = time_limit
+        self.api = api or API()
         self.logger.info("Started")
         self.logger.info(" @ db: " + str(mongo_host) + " on Port: " + str(MongoClient.PORT))
+        self.start_time = time.time()
 
     def on_connect(self):
         """Called once connected to streaming server.
@@ -35,12 +35,11 @@ class SampleStreamListener(tweepy.StreamListener):
             if time.time() >= self.start_time + self.limit:
                 self.logger.info("Time limit reached")
                 return False  # kill the stream
+
             client = MongoClient(self.mongo_host)
             db = client.twitterdb
             datajson = json.loads(data)
-            print(self.collection_name)
-            collection = db[self.collection_name]
-            db.collection.insert(datajson)
+            db[self.collection_name].insert(datajson)
             print(datajson)
         except Exception as e:
             self.logger.info("Exception " + str(e))

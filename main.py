@@ -75,7 +75,7 @@ def collect_streaming_sample():
     db, mongo_host, collection_name, time_limit, logfile = config_sample_stream(config)
     logger = setup_logger(logfile)
     auth = get_auth()
-    listener = sample_stream_listener.SampleStreamListener(logger, mongo_host, time_limit, collection_name, auth)
+    listener = sample_stream_listener.SampleStreamListener(logger, mongo_host, collection_name, time_limit,  auth)
     sample_stream = Stream(auth, listener)
     return sample_stream
 
@@ -85,7 +85,7 @@ def collect_keyword_stream():
     db, mongo_host, collection_name, time_limit, logfile, tags = config_keyword_stream(config)
     logger = setup_logger(logfile)
     auth = get_auth()
-    listener = sample_stream_listener.SampleStreamListener(logger, mongo_host, time_limit, collection_name, auth)
+    listener = sample_stream_listener.SampleStreamListener(logger, mongo_host, collection_name, time_limit,  auth)
     keywords_stream = Stream(auth, listener)
     return keywords_stream, tags
 
@@ -95,7 +95,7 @@ def collect_user_stream():
     db, mongo_host, collection_name, time_limit, logfile, user_ids = config_user_stream(config)
     logger = setup_logger(logfile)
     auth = get_auth()
-    listener = sample_stream_listener.SampleStreamListener(logger, mongo_host, time_limit, collection_name, auth)
+    listener = sample_stream_listener.SampleStreamListener(logger, mongo_host, collection_name, time_limit, auth)
     keywords_stream = Stream(auth, listener)
     return keywords_stream, user_ids
 
@@ -103,18 +103,16 @@ def collect_user_stream():
 if __name__ == '__main__':
     config_file = "/home/paul/PycharmProjects/websciAE/docs/config.ini"
     stream = collect_streaming_sample()
+
     stream.sample(languages=['en'])
-    keyword_stream, tracking_tags = collect_keyword_stream()
-    keyword_stream.filter(track=tracking_tags,  languages='en')
-    user_stream, user_ids = collect_user_stream()
-    user_stream.filter(follow=user_ids, languages='en')
+    #keyword_stream, tracking_tags = collect_keyword_stream()
+    #keyword_stream.filter(track=tracking_tags,  languages='en')
+    #user_stream, user_ids = collect_user_stream()
+    #user_stream.filter(follow=user_ids, languages='en')
 
 
 
 
-# stream.filter(track=KEYWORD)
-# logger.info("Finished")
 
-# logfile = '/home/paul/PycharmProjects/websciAE/docs/streamlog.log'
 
 
