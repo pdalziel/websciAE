@@ -29,8 +29,10 @@ def search(target, date, maxnum=1000):
 
 
 
-
-
+# TODO refactor to accept args
+# TODO store results in db
+# TODO geo search
+# TODO store geo search
 
 
 try:
