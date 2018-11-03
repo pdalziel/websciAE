@@ -1,6 +1,6 @@
 import logging
 import configparser
-
+from time import sleep
 
 import tweepy
 from pymongo import MongoClient
@@ -59,6 +59,17 @@ def config_user_stream(config):
     return db, mongo_host, collection, time_limit, logfile, user_ids
 
 
+def config_location_stream(config):
+    config = load_config()
+    mongo_host = config['LOCATION_STREAM']['mongo_host']
+    db = config['LOCATION_STREAM']['db']
+    collection = config['LOCATION_STREAM']['collection']
+    time_limit = int(config['LOCATION_STREAM']['time_limit'])
+    logfile = config['LOCATION_STREAM']['logfile']
+    location = [config['LOCATION_STREAM']['location']]
+    return db, mongo_host, collection, time_limit, logfile, location
+
+
 def get_auth():
     secrets_dict = get_tokens.load_access_token()
     consumer_key = secrets_dict.get("consumer_key")
@@ -100,15 +111,28 @@ def collect_user_stream():
     return keywords_stream, user_ids
 
 
+def collect_location_stream():
+    config = load_config()
+    db, mongo_host, collection_name, time_limit, logfile, location = config_location_stream(config)
+    logger = setup_logger(logfile)
+    auth = get_auth()
+    listener = sample_stream_listener.SampleStreamListener(logger, mongo_host, collection_name, time_limit, auth)
+    location_stream = Stream(auth, listener)
+    return location_stream, location
+
+
 if __name__ == '__main__':
     config_file = "/home/paul/PycharmProjects/websciAE/docs/config.ini"
     stream = collect_streaming_sample()
+    stream.sample(languages=['en'], async=True)
+    keyword_stream, tracking_tags = collect_keyword_stream()
+    keyword_stream.filter(track=['#brexit'], async=True)
+    user_stream, user_ids = collect_user_stream()
+    user_stream.filter(follow=['813286', '25073877'], async=True)
 
-    stream.sample(languages=['en'])
-    #keyword_stream, tracking_tags = collect_keyword_stream()
-    #keyword_stream.filter(track=tracking_tags,  languages='en')
-    #user_stream, user_ids = collect_user_stream()
-    #user_stream.filter(follow=user_ids, languages='en')
+    location_stream, location = collect_location_stream()
+    location_stream.filter(locations=[-4.516, 55.7225, -3.975, 55.978], async=True)
+    # TODO fix thread lock
 
 
 

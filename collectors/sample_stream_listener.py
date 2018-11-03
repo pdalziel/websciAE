@@ -26,6 +26,7 @@ class SampleStreamListener(tweepy.StreamListener):
         """
         self.logger.info("Connected")
 
+
     def on_data(self, data):
         """Called when raw data is received from connection.
         Override this method if you wish to manually handle
@@ -40,7 +41,7 @@ class SampleStreamListener(tweepy.StreamListener):
             db = client.twitterdb
             datajson = json.loads(data)
             db[self.collection_name].insert(datajson)
-            print(datajson)
+            print(self.collection_name + " : " + str(datajson))
         except Exception as e:
             self.logger.info("Exception " + str(e))
             print(e)
@@ -48,6 +49,7 @@ class SampleStreamListener(tweepy.StreamListener):
     def on_error(self, status_code):
         """Called when a non-200 status code is returned"""
         self.logger.info("Error " + str(status_code))
+        print(str(status_code))
         if status_code == 420:
             time.sleep(900)
         return True  # Don't kill the stream
