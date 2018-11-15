@@ -1,9 +1,11 @@
 import logging
 import configparser
-from time import sleep
+import os
 
 import tweepy
 from pymongo import MongoClient
+from time import sleep
+
 from tweepy import Stream
 from collectors import get_tokens
 from collectors import sample_stream_listener
@@ -122,7 +124,11 @@ def collect_location_stream():
 
 
 if __name__ == '__main__':
-    config_file = "/home/paul/PycharmProjects/websciAE/docs/config.ini"
+    script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
+    rel_path = "docs/config.ini"
+    parentDir = os.path.dirname(script_dir)
+    config_file = os.path.join(parentDir, rel_path)
+
     stream = collect_streaming_sample()
     stream.sample(languages=['en'], async=True)
     keyword_stream, tracking_tags = collect_keyword_stream()
