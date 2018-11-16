@@ -49,6 +49,7 @@ class SampleStreamListener(tweepy.StreamListener):
         """Called when a non-200 status code is returned"""
         self.logger.info("Error " + str(status_code))
         print(str(status_code))
+        # deal with rate limit if tweepy fails to
         if status_code == 420:
             time.sleep(900)
         return True  # Don't kill the stream

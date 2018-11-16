@@ -1,10 +1,12 @@
 import pymongo
-import collect_twitter_stream
+import sample_stream
 import json
 import tweepy
 import sys
 
 from pymongo import MongoClient
+
+import pipeline
 
 
 def connect_mongo(mongo_host=None):
@@ -23,7 +25,7 @@ def search_api(api, collection_name, tags=None, date_range=None,):
 
 
 def get_api():
-    auth = collect_twitter_stream.get_auth()
+    auth = pipeline.get_auth()
     auth_api = tweepy.API(auth, wait_on_rate_limit=True,
                           wait_on_rate_limit_notify=True)
 
