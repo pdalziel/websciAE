@@ -1,17 +1,14 @@
-import pymongo
-import sample_stream
-import json
 import tweepy
 import sys
 
-from pymongo import MongoClient
-
 import pipeline
+import pipeline
+from utils.connect import Connect
 
 
-def connect_mongo(mongo_host=None):
-    client = MongoClient('mongodb://localhost/')
-    db = client.twitterdb
+def connect_mongo():
+    conn = Connect.get_connection()
+    db = conn.twitterdb
     return db
 
 
@@ -35,24 +32,10 @@ def get_api():
     return auth_api
 
 
-if __name__ == '__main__':
-    collection = ['search_api']
-    tags = ['#Brexit']  # this is what we're searching for
-    maxTweets = 100000000 # Some arbitrary large number
-    tweetsPerQry = 100  # this is the max the API permits
-    dates = ['2018-20-10', '2018-25-11']
+#if __name__ == '__main__':
     # '55.8642,4.2518'  # glasgow lat and long
-    latitude = 55.8642# geographical centre of search
-    longitude = 4.2518  # geographical centre of search
-    max_range = 10  # search range in kilometres
-    geo = "%f,%f,%dkm" % (latitude, longitude, max_range)
 
-    api = get_api()
-    try:
-        search_api(api, collection, tags, dates)
-    except tweepy.TweepError as e:
-        # Just exit if any error
-        print("some error : " + str(e))
+
 
 # q – the search query string
 #         lang – Restricts tweets to the given language, given by an ISO 639-1 code.

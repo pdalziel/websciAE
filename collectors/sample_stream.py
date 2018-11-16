@@ -12,7 +12,7 @@ def config_sample_stream(config):
 
 def collect_streaming_sample():
     config = pipeline.load_config()
-    db, mongo_host = pipeline.config_mongodb()
+    mongo_host = pipeline.config_mongodb()
     collection_name, time_limit = config_sample_stream(config)
     logger = pipeline.setup_logger('streaming.log')
     auth = pipeline.get_auth()

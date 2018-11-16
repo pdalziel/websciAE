@@ -39,7 +39,7 @@ class SampleStreamListener(tweepy.StreamListener):
             client = MongoClient(self.mongo_host)
             db = client.twitterdb
             datajson = json.loads(data)
-            #db[self.collection_name].insert(datajson)
+            db[self.collection_name].insert(datajson)
             print(self.collection_name + " : " + str(datajson))
         except Exception as e:
             self.logger.info("Exception " + str(e))

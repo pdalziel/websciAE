@@ -8,8 +8,6 @@ from utils.connect import Connect
 
 
 def count_total_collected_data(collection=None):
-    # TODO get total
-
     conn = Connect.get_connection()
     db = conn.twitterdb
     if collection is None:
