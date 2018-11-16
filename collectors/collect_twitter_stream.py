@@ -12,15 +12,26 @@ from collectors import sample_stream_listener
 
 # TODO refactor config to remove redundancy
 
+CONFIG_PATH = "docs/config.ini"
+
+
+def get_project_dir():
+    # absolute dir this script is in
+    return os.path.dirname(os.path.dirname(__file__))
+
 
 def load_config():
+    project_dir = get_project_dir()
+    config_file = os.path.join(project_dir, CONFIG_PATH)
     config = configparser.ConfigParser()
     config.read(config_file)
     return config
 
 
-def setup_logger(logfile):
+def setup_logger(log_name):
     # setup logging
+    path = get_project_dir()
+    logfile = path + '/logs/' + log_name
     logger = logging.getLogger()
     handler = logging.FileHandler(logfile)
     formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
@@ -31,45 +42,40 @@ def setup_logger(logfile):
 
 
 def config_sample_stream(config):
-    mongo_host = config['SAMPLE_STREAM']['mongo_host']
-    db = config['SAMPLE_STREAM']['db']
     collection = config['SAMPLE_STREAM']['collection']
     time_limit = int(config['SAMPLE_STREAM']['time_limit'])
-    logfile = config['SAMPLE_STREAM']['logfile']
-    return db, mongo_host, collection, time_limit, logfile
+    return collection, time_limit,
 
 
-def config_keyword_stream(config):
+def config_mongodb():
     config = load_config()
-    mongo_host = config['KEYWORD_STREAM']['mongo_host']
-    db = config['KEYWORD_STREAM']['db']
+    mongo_host = config['DEFAULT']['mongo_host']
+    db = config['DEFAULT']['db']
+    return db, mongo_host
+
+
+def config_keyword_stream():
+    config = load_config()
     collection = config['KEYWORD_STREAM']['collection']
     time_limit = int(config['KEYWORD_STREAM']['time_limit'])
-    logfile = config['KEYWORD_STREAM']['logfile']
     keywords = config['KEYWORD_STREAM']['keywords']
-    return db, mongo_host, collection, time_limit, logfile, keywords
+    return collection, time_limit, keywords
 
 
-def config_user_stream(config):
+def config_user_stream():
     config = load_config()
-    mongo_host = config['USER_STREAM']['mongo_host']
-    db = config['USER_STREAM']['db']
     collection = config['USER_STREAM']['collection']
     time_limit = int(config['USER_STREAM']['time_limit'])
-    logfile = config['USER_STREAM']['logfile']
     user_ids = config['USER_STREAM']['user_ids']
-    return db, mongo_host, collection, time_limit, logfile, user_ids
+    return collection, time_limit, user_ids
 
 
-def config_location_stream(config):
+def config_location_stream():
     config = load_config()
-    mongo_host = config['LOCATION_STREAM']['mongo_host']
-    db = config['LOCATION_STREAM']['db']
     collection = config['LOCATION_STREAM']['collection']
     time_limit = int(config['LOCATION_STREAM']['time_limit'])
-    logfile = config['LOCATION_STREAM']['logfile']
     location = [config['LOCATION_STREAM']['location']]
-    return db, mongo_host, collection, time_limit, logfile, location
+    return collection, time_limit, location
 
 
 def get_auth():
@@ -85,8 +91,9 @@ def get_auth():
 
 def collect_streaming_sample():
     config = load_config()
-    db, mongo_host, collection_name, time_limit, logfile = config_sample_stream(config)
-    logger = setup_logger(logfile)
+    db, mongo_host = config_mongodb()
+    collection_name, time_limit = config_sample_stream(config)
+    logger = setup_logger('streaming.log')
     auth = get_auth()
     listener = sample_stream_listener.SampleStreamListener(logger, mongo_host, collection_name, time_limit,  auth)
     sample_stream = Stream(auth, listener)
@@ -94,9 +101,9 @@ def collect_streaming_sample():
 
 
 def collect_keyword_stream():
-    config = load_config()
-    db, mongo_host, collection_name, time_limit, logfile, tags = config_keyword_stream(config)
-    logger = setup_logger(logfile)
+    db, mongo_host = config_mongodb()
+    collection_name, time_limit, tags = config_keyword_stream()
+    logger = setup_logger('keyword_stream')
     auth = get_auth()
     listener = sample_stream_listener.SampleStreamListener(logger, mongo_host, collection_name, time_limit,  auth)
     keywords_stream = Stream(auth, listener)
@@ -104,9 +111,9 @@ def collect_keyword_stream():
 
 
 def collect_user_stream():
-    config = load_config()
-    db, mongo_host, collection_name, time_limit, logfile, user_ids = config_user_stream(config)
-    logger = setup_logger(logfile)
+    db, mongo_host = config_mongodb()
+    collection_name, time_limit, user_ids = config_user_stream()
+    logger = setup_logger('user_stream')
     auth = get_auth()
     listener = sample_stream_listener.SampleStreamListener(logger, mongo_host, collection_name, time_limit, auth)
     keywords_stream = Stream(auth, listener)
@@ -114,9 +121,9 @@ def collect_user_stream():
 
 
 def collect_location_stream():
-    config = load_config()
-    db, mongo_host, collection_name, time_limit, logfile, location = config_location_stream(config)
-    logger = setup_logger(logfile)
+    db, mongo_host = config_mongodb()
+    collection_name, time_limit, location = config_location_stream()
+    logger = setup_logger('location_stream')
     auth = get_auth()
     listener = sample_stream_listener.SampleStreamListener(logger, mongo_host, collection_name, time_limit, auth)
     location_stream = Stream(auth, listener)
@@ -124,10 +131,11 @@ def collect_location_stream():
 
 
 if __name__ == '__main__':
-    script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
-    rel_path = "docs/config.ini"
-    parentDir = os.path.dirname(script_dir)
-    config_file = os.path.join(parentDir, rel_path)
+
+
+
+
+
 
     stream = collect_streaming_sample()
     stream.sample(languages=['en'], async=True)

@@ -2,7 +2,7 @@ import json
 from pymongo import MongoClient
 
 
-class Pipeline():
+class Pipeline:
     MONGO_HOST = 'mongodb://localhost/twitterdb'
 
 # TODO get sample
