@@ -125,7 +125,9 @@ def api_search():
         # Just exit if any error
         print("some error : " + str(e))
 
-
+# TODO dump mongo db to csv
+# TODO analysis on csv
+# TODO implement geo enhance - Locality sensitive hashing
 
 if __name__ == '__main__':
     #api_search()
