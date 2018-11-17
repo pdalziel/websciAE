@@ -15,9 +15,7 @@ import keyword_stream
 import location_stream
 import sample_stream
 import user_stream
-from analysis.measure_analytics import count_total_collected_data
-
-
+from analysis.measure_analytics import count_total_collected_data, count_retweets, count_quotes, count_geo_tagged
 
 # TODO get sample
 # TODO unpack sample
@@ -131,7 +129,10 @@ def api_search():
 
 if __name__ == '__main__':
     #api_search()
-    count = count_total_collected_data('loc_stream')
+    #count = count_total_collected_data()
+    #count = count_quotes('tweets')
+    #count = count_retweets('tweets')
+    count = count_geo_tagged('tweets')
     print(count)
     #start_sample_stream()
     #start_keyword_stream()
